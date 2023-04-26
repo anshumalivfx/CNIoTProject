@@ -8,22 +8,22 @@
 import SwiftUI
 
 struct MenuBarCoinView: View {
+    @ObservedObject var viewModel: MenuBarCoinViewModel
+    
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: "circle.fill")
                 .foregroundColor(.green)
             
             VStack(alignment: .trailing, spacing: -2) {
-                Text("Bitcoin")
-                Text("$40000")
+                Text(viewModel.name)
+                Text(viewModel.value)
             }
             .font(.caption)
+        }.onAppear {
+            viewModel.subscribeToService()
         }
     }
 }
 
-struct MenuBarCoinView_Previews: PreviewProvider {
-    static var previews: some View {
-        MenuBarCoinView()
-    }
-}
+

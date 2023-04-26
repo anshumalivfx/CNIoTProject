@@ -9,7 +9,9 @@ import SwiftUI
 import Cocoa
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    
+    var menuBarViewModel: MenuBarCoinViewModel!
+    var popoverCOinViewModel: PopOverCoinViewModel!
+    let coinCapService = CoinCapPriceService()
     var statusItem: NSStatusItem!
     
     let popover = NSPopover()
@@ -20,7 +22,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }()
     
     func applicationDidFinishLaunching(_ notification: Notification) {
+        setupCoinCapService()
+        setupPopOver()
         setupMenuBar()
+    }
+    
+    func setupCoinCapService() {
+        coinCapService.connect()
+        coinCapService.startMonitorNetworkConnectivity()
     }
 }
 
@@ -29,6 +38,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 extension AppDelegate {
     func setupMenuBar(){
+        menuBarViewModel = MenuBarCoinViewModel(service: coinCapService)
         statusItem = NSStatusBar.system.statusItem(withLength: 64)
         guard
             let contentView = self.contentView,
@@ -36,7 +46,7 @@ extension AppDelegate {
             return
         }
         
-        let hostingView = NSHostingView(rootView: MenuBarCoinView())
+        let hostingView = NSHostingView(rootView: MenuBarCoinView(viewModel: menuBarViewModel))
         hostingView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(hostingView)
         
@@ -52,7 +62,7 @@ extension AppDelegate {
     }
     
     @objc func menuBarClicked() {
-        setupPopOver()
+        
         if popover.isShown {
             popover.performClose(nil)
             return
